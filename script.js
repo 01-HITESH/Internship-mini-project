@@ -35,6 +35,7 @@ function performCalculation(a, operator, b) {
     return "DIV_BY_ZERO";
   }
 
+  // For production-grade expression support (beyond basic binary operations), use a dedicated parser.
   switch (operator) {
     case "+":
       return a + b;
@@ -51,7 +52,6 @@ function performCalculation(a, operator, b) {
 
 function formatNumber(value) {
   if (!Number.isFinite(value)) return "Error";
-  // For production-grade expression support (beyond basic binary operations), use a dedicated parser.
   return Number.isInteger(value)
     ? String(value)
     : String(Number(value.toFixed(MAX_DECIMAL_PLACES)));
