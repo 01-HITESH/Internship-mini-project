@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Calculator App</title>
+  <style>
+    :root {
+      --bg: #0f1115;
+      --panel: #1a1f29;
+      --display: #0b0e13;
+      --button: #2a3140;
+      --button-hover: #3a4254;
+      --button-active: #4a5468;
+      --operator: #3d3a5f;
+      --operator-hover: #4f4b7a;
+      --accent: #5a7dff;
+      --danger: #ff5c75;
+      --text: #f4f6fb;
+      --muted: #a6aec5;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #191f2b 0%, var(--bg) 60%);
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      color: var(--text);
+      padding: 1rem;
+    }
+
+    .calculator {
+      width: min(100%, 360px);
+      background: var(--panel);
+      border: 1px solid #2c3341;
+      border-radius: 16px;
+      padding: 1rem;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.45);
+    }
+
+    .display {
+      width: 100%;
+      background: var(--display);
+      color: var(--text);
+      border: 1px solid #252c38;
+      border-radius: 12px;
+      text-align: right;
+      padding: 1rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+
+    .display.error {
+      color: var(--danger);
+      font-size: 1.2rem;
+    }
+
+    .buttons {
+      margin-top: 1rem;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 0.6rem;
+    }
+
+    .calculator-button {
+      border: none;
+      border-radius: 10px;
+      background: var(--button);
+      color: var(--text);
+      font-size: 1.05rem;
+      padding: 0.9rem;
+      cursor: pointer;
+      transition: transform 120ms ease, background-color 140ms ease, box-shadow 140ms ease;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .calculator-button[data-type="operator"] {
+      background: var(--operator);
+    }
+
+    .calculator-button[data-type="equals"] {
+      background: var(--accent);
+      grid-column: span 2;
+    }
+
+    .calculator-button[data-type="clear"] {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .calculator-button:hover {
+      background: var(--button-hover);
+    }
+
+    .calculator-button[data-type="operator"]:hover {
+      background: var(--operator-hover);
+    }
+
+    .calculator-button:active {
+      transform: translateY(1px) scale(0.98);
+      background: var(--button-active);
+    }
+
+    .calculator-button:focus-visible {
+      outline: 2px solid #7f9cff;
+      outline-offset: 2px;
+    }
+
+    @media (max-width: 420px) {
+      .calculator {
+        border-radius: 12px;
+        padding: 0.8rem;
+      }
+
+      .calculator-button {
+        padding: 0.8rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="calculator" aria-label="Calculator">
+    <div id="display" class="display" role="status" aria-live="polite">0</div>
+
+    <section class="buttons" aria-label="Calculator buttons">
+      <button class="calculator-button" data-type="clear" data-value="C" aria-label="Clear">C</button>
+      <button class="calculator-button" data-type="operator" data-value="/" aria-label="Divide">÷</button>
+      <button class="calculator-button" data-type="operator" data-value="*" aria-label="Multiply">×</button>
+      <button class="calculator-button" data-type="operator" data-value="-" aria-label="Subtract">−</button>
+
+      <button class="calculator-button" data-type="number" data-value="7">7</button>
+      <button class="calculator-button" data-type="number" data-value="8">8</button>
+      <button class="calculator-button" data-type="number" data-value="9">9</button>
+      <button class="calculator-button" data-type="operator" data-value="+" aria-label="Add">+</button>
+
+      <button class="calculator-button" data-type="number" data-value="4">4</button>
+      <button class="calculator-button" data-type="number" data-value="5">5</button>
+      <button class="calculator-button" data-type="number" data-value="6">6</button>
+      <button class="calculator-button" data-type="number" data-value=".">.</button>
+
+      <button class="calculator-button" data-type="number" data-value="1">1</button>
+      <button class="calculator-button" data-type="number" data-value="2">2</button>
+      <button class="calculator-button" data-type="number" data-value="3">3</button>
+      <button class="calculator-button" data-type="number" data-value="0">0</button>
+
+      <button class="calculator-button" data-type="equals" data-value="=">=</button>
+    </section>
+  </main>
+
+  <script>
+    const displayElement = document.getElementById('display');
+    const calculatorButtons = document.querySelectorAll('.calculator-button');
+
+    // State object keeps input and last operator so we can handle edge cases predictably.
+    const calculatorState = {
+      currentInput: '0',
+      previousOperator: null,
+      justEvaluated: false,
+      hasError: false
+    };
+
+    const operatorPattern = /[+\-*/]/;
+
+    function updateDisplay() {
+      displayElement.textContent = calculatorState.currentInput;
+      displayElement.classList.toggle('error', calculatorState.hasError);
+    }
+
+    function resetCalculator() {
+      calculatorState.currentInput = '0';
+      calculatorState.previousOperator = null;
+      calculatorState.justEvaluated = false;
+      calculatorState.hasError = false;
+      updateDisplay();
+    }
+
+    function getLastNumberSegment(expression) {
+      return expression.split(/[+\-*/]/).pop();
+    }
+
+    function handleNumberInput(value) {
+      if (calculatorState.hasError) {
+        resetCalculator();
+      }
+
+      if (calculatorState.justEvaluated && !operatorPattern.test(value)) {
+        calculatorState.currentInput = '0';
+        calculatorState.justEvaluated = false;
+      }
+
+      if (value === '.') {
+        const lastSegment = getLastNumberSegment(calculatorState.currentInput);
+        if (lastSegment.includes('.')) {
+          return;
+        }
+
+        // Prepend 0 for leading decimal points like ".5" -> "0.5".
+        if (
+          calculatorState.currentInput === '0' ||
+          operatorPattern.test(calculatorState.currentInput.slice(-1))
+        ) {
+          calculatorState.currentInput += calculatorState.currentInput === '0' ? '.' : '0.';
+          updateDisplay();
+          return;
+        }
+      }
+
+      if (calculatorState.currentInput === '0' && value !== '.') {
+        calculatorState.currentInput = value;
+      } else {
+        calculatorState.currentInput += value;
+      }
+
+      updateDisplay();
+    }
+
+    function handleOperatorInput(operator) {
+      if (calculatorState.hasError) {
+        return;
+      }
+
+      calculatorState.justEvaluated = false;
+
+      if (operatorPattern.test(calculatorState.currentInput.slice(-1))) {
+        // Consecutive operators replace the previous operator.
+        calculatorState.currentInput = calculatorState.currentInput.slice(0, -1) + operator;
+      } else {
+        calculatorState.currentInput += operator;
+      }
+
+      calculatorState.previousOperator = operator;
+      updateDisplay();
+    }
+
+    function evaluateExpression() {
+      if (calculatorState.hasError) {
+        return;
+      }
+
+      let expression = calculatorState.currentInput;
+
+      if (operatorPattern.test(expression.slice(-1))) {
+        expression = expression.slice(0, -1);
+      }
+
+      if (!expression || expression === '.') {
+        return;
+      }
+
+      try {
+        // NOTE: eval() is used here only for this controlled beginner demo.
+        // Production applications should use a proper expression parser for security.
+        const calculationResult = eval(expression);
+
+        if (!Number.isFinite(calculationResult)) {
+          calculatorState.currentInput = 'Cannot divide by zero';
+          calculatorState.hasError = true;
+        } else {
+          calculatorState.currentInput = String(calculationResult);
+          calculatorState.previousOperator = null;
+          calculatorState.justEvaluated = true;
+        }
+      } catch (error) {
+        calculatorState.currentInput = 'Invalid expression';
+        calculatorState.hasError = true;
+      }
+
+      updateDisplay();
+    }
+
+    calculatorButtons.forEach((button) => {
+      button.addEventListener('click', () => {
+        const { type, value } = button.dataset;
+
+        if (type === 'clear') {
+          resetCalculator();
+          return;
+        }
+
+        if (type === 'number') {
+          handleNumberInput(value);
+          return;
+        }
+
+        if (type === 'operator') {
+          handleOperatorInput(value);
+          return;
+        }
+
+        if (type === 'equals') {
+          evaluateExpression();
+        }
+      });
+    });
+  </script>
+</body>
+</html>
