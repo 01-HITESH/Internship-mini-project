@@ -1,5 +1,6 @@
 const display = document.querySelector("#display");
 const buttons = document.querySelectorAll(".btn");
+const MAX_DECIMAL_PLACES = 10;
 
 const state = {
   currentInput: "0",
@@ -34,14 +35,26 @@ function performCalculation(a, operator, b) {
     return "DIV_BY_ZERO";
   }
 
-  // NOTE: eval() is acceptable for simple demos, but production apps should use
-  // a proper expression parser to avoid security vulnerabilities.
-  return eval(`${a} ${operator} ${b}`);
+  switch (operator) {
+    case "+":
+      return a + b;
+    case "-":
+      return a - b;
+    case "*":
+      return a * b;
+    case "/":
+      return a / b;
+    default:
+      return NaN;
+  }
 }
 
 function formatNumber(value) {
   if (!Number.isFinite(value)) return "Error";
-  return Number.isInteger(value) ? String(value) : String(Number(value.toFixed(10)));
+  // For production-grade expression support, use a dedicated parser instead of ad-hoc string evaluation.
+  return Number.isInteger(value)
+    ? String(value)
+    : String(Number(value.toFixed(MAX_DECIMAL_PLACES)));
 }
 
 function inputNumber(value) {
