@@ -51,7 +51,7 @@ function performCalculation(a, operator, b) {
 
 function formatNumber(value) {
   if (!Number.isFinite(value)) return "Error";
-  // For production-grade expression support, use a dedicated parser instead of ad-hoc string evaluation.
+  // For production-grade expression support (beyond basic binary operations), use a dedicated parser.
   return Number.isInteger(value)
     ? String(value)
     : String(Number(value.toFixed(MAX_DECIMAL_PLACES)));
@@ -67,7 +67,7 @@ function inputNumber(value) {
       return;
     }
 
-    // Prevent multiple decimal points in one number.
+    // Prevent multiple decimal point entries in one number.
     if (state.currentInput.includes(".")) return;
 
     // Prepend leading decimal with 0.
