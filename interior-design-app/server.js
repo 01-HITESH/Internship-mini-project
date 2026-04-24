@@ -1,10 +1,11 @@
 'use strict';
 
-const express = require('express');
-const bcrypt  = require('bcryptjs');
-const jwt     = require('jsonwebtoken');
-const fs      = require('fs');
-const path    = require('path');
+const express   = require('express');
+const bcrypt    = require('bcryptjs');
+const jwt       = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
+const fs        = require('fs');
+const path      = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -26,6 +27,15 @@ if (!fs.existsSync(USERS_FILE)) {
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ─── Rate limiting ────────────────────────────────────────────────────────────
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,                   // max 20 requests per window per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please try again later.' },
+});
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 function readUsers() {
@@ -55,7 +65,7 @@ function authMiddleware(req, res, next) {
 }
 
 // ─── Register ─────────────────────────────────────────────────────────────────
-app.post('/api/register', async (req, res) => {
+app.post('/api/register', authLimiter, async (req, res) => {
   const { username, email, password } = req.body;
 
   if (!username || !email || !password) {
@@ -68,7 +78,11 @@ app.post('/api/register', async (req, res) => {
     });
   }
 
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+  // Simple structural email check (avoids backtracking-prone regex)
+  const emailNorm = email.trim().toLowerCase();
+  const atIdx = emailNorm.indexOf('@');
+  if (atIdx < 1 || atIdx !== emailNorm.lastIndexOf('@') || emailNorm.length > 254 ||
+      !emailNorm.slice(atIdx + 1).includes('.') || emailNorm.endsWith('.')) {
     return res.status(400).json({ error: 'Please enter a valid email address.' });
   }
 
@@ -78,10 +92,10 @@ app.post('/api/register', async (req, res) => {
 
   const users = readUsers();
 
-  if (users.some(u => u.email.toLowerCase() === email.toLowerCase())) {
+  if (users.some(u => u.email === emailNorm)) {
     return res.status(409).json({ error: 'An account with that email already exists.' });
   }
-  if (users.some(u => u.username.toLowerCase() === username.toLowerCase())) {
+  if (users.some(u => u.username.toLowerCase() === username.trim().toLowerCase())) {
     return res.status(409).json({ error: 'That username is already taken.' });
   }
 
@@ -89,7 +103,7 @@ app.post('/api/register', async (req, res) => {
   const newUser = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     username: username.trim(),
-    email: email.toLowerCase().trim(),
+    email: emailNorm,
     password: hashedPassword,
     createdAt: new Date().toISOString(),
   };
@@ -111,15 +125,16 @@ app.post('/api/register', async (req, res) => {
 });
 
 // ─── Login ────────────────────────────────────────────────────────────────────
-app.post('/api/login', async (req, res) => {
+app.post('/api/login', authLimiter, async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required.' });
   }
 
+  const emailNorm = email.trim().toLowerCase();
   const users = readUsers();
-  const user  = users.find(u => u.email.toLowerCase() === email.toLowerCase().trim());
+  const user  = users.find(u => u.email === emailNorm);
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
     return res.status(401).json({ error: 'Invalid email or password.' });
@@ -139,7 +154,7 @@ app.post('/api/login', async (req, res) => {
 });
 
 // ─── Verify token ─────────────────────────────────────────────────────────────
-app.get('/api/verify', authMiddleware, (req, res) => {
+app.get('/api/verify', authLimiter, authMiddleware, (req, res) => {
   res.json({ valid: true, user: req.user });
 });
 
