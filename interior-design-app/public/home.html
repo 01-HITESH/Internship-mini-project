@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DesignSpace – My Studio</title>
+  <link rel="stylesheet" href="css/home.css" />
+</head>
+<body>
+
+  <!-- ── Navigation ──────────────────────────────────────────────────────── -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-brand">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-title">DesignSpace</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#categories" class="nav-link">Rooms</a></li>
+      <li><a href="#styles"     class="nav-link">Styles</a></li>
+      <li><a href="#planner"    class="nav-link">3D Planner</a></li>
+      <li><a href="#featured"   class="nav-link">Explore</a></li>
+    </ul>
+    <div class="nav-user">
+      <span class="user-greeting" id="user-greeting">Welcome</span>
+      <button class="btn-logout" id="logout-btn">Sign Out</button>
+    </div>
+  </nav>
+
+  <!-- ── Hero ─────────────────────────────────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">✦ Interior Design Platform</div>
+      <h1>Design Your<br><span class="hero-accent">Dream Space</span></h1>
+      <p>Explore thousands of interior ideas, visualize your room in 3D, and bring your vision to life.</p>
+      <div class="hero-cta">
+        <a href="#planner"    class="btn-primary">Start Designing</a>
+        <a href="#categories" class="btn-outline">Explore Rooms</a>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><strong>8,300+</strong><span>Designs</span></div>
+        <div class="stat"><strong>2,400+</strong><span>Happy Users</span></div>
+        <div class="stat"><strong>150+</strong><span>Styles</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Room Categories ──────────────────────────────────────────────────── -->
+  <section class="section" id="categories">
+    <div class="container">
+      <div class="section-header">
+        <h2>Explore by Room</h2>
+        <p>Find inspiration for every space in your home</p>
+      </div>
+      <div class="categories-grid">
+        <div class="category-card" data-room="living">
+          <div class="category-img living-room">
+            <div class="category-overlay"><span>2,340 designs</span></div>
+          </div>
+          <h3>Living Room</h3>
+        </div>
+        <div class="category-card" data-room="bedroom">
+          <div class="category-img bedroom">
+            <div class="category-overlay"><span>1,890 designs</span></div>
+          </div>
+          <h3>Bedroom</h3>
+        </div>
+        <div class="category-card" data-room="kitchen">
+          <div class="category-img kitchen">
+            <div class="category-overlay"><span>1,560 designs</span></div>
+          </div>
+          <h3>Kitchen</h3>
+        </div>
+        <div class="category-card" data-room="bathroom">
+          <div class="category-img bathroom">
+            <div class="category-overlay"><span>980 designs</span></div>
+          </div>
+          <h3>Bathroom</h3>
+        </div>
+        <div class="category-card" data-room="office">
+          <div class="category-img home-office">
+            <div class="category-overlay"><span>720 designs</span></div>
+          </div>
+          <h3>Home Office</h3>
+        </div>
+        <div class="category-card" data-room="dining">
+          <div class="category-img dining-room">
+            <div class="category-overlay"><span>840 designs</span></div>
+          </div>
+          <h3>Dining Room</h3>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Design Styles ────────────────────────────────────────────────────── -->
+  <section class="section section-dark" id="styles">
+    <div class="container">
+      <div class="section-header light">
+        <h2>Choose Your Style</h2>
+        <p>What design aesthetic speaks to you?</p>
+      </div>
+      <div class="styles-grid">
+        <div class="style-card" data-style="modern">
+          <div class="style-preview modern-preview"></div>
+          <span>Modern</span>
+        </div>
+        <div class="style-card" data-style="scandinavian">
+          <div class="style-preview scandi-preview"></div>
+          <span>Scandinavian</span>
+        </div>
+        <div class="style-card" data-style="industrial">
+          <div class="style-preview industrial-preview"></div>
+          <span>Industrial</span>
+        </div>
+        <div class="style-card" data-style="bohemian">
+          <div class="style-preview bohemian-preview"></div>
+          <span>Bohemian</span>
+        </div>
+        <div class="style-card" data-style="traditional">
+          <div class="style-preview traditional-preview"></div>
+          <span>Traditional</span>
+        </div>
+        <div class="style-card" data-style="minimalist">
+          <div class="style-preview minimalist-preview"></div>
+          <span>Minimalist</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Interactive 3D Room Planner ─────────────────────────────────────── -->
+  <section class="section section-planner" id="planner">
+    <div class="container">
+      <div class="section-header">
+        <h2>3D Room Planner</h2>
+        <p>Customise your space in real-time with our interactive 3D previewer</p>
+      </div>
+      <div class="planner-layout">
+
+        <!-- Canvas -->
+        <div class="planner-canvas-wrap">
+          <canvas id="planner-canvas"></canvas>
+          <div class="planner-badge">Live 3D Preview</div>
+        </div>
+
+        <!-- Controls -->
+        <div class="planner-controls">
+          <div class="control-group">
+            <h4>Room Theme</h4>
+            <div class="theme-buttons">
+              <button class="theme-btn active" data-theme="modern">Modern</button>
+              <button class="theme-btn"        data-theme="cozy">Cozy</button>
+              <button class="theme-btn"        data-theme="scandinavian">Scandi</button>
+              <button class="theme-btn"        data-theme="industrial">Industrial</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>Wall Colour</h4>
+            <div class="swatches">
+              <button class="wall-swatch selected" data-color="#f5f5f5" style="background:#f5f5f5" title="Pearl White"></button>
+              <button class="wall-swatch"          data-color="#d4c5b0" style="background:#d4c5b0" title="Warm Beige"></button>
+              <button class="wall-swatch"          data-color="#c5d5e8" style="background:#c5d5e8" title="Sky Blue"></button>
+              <button class="wall-swatch"          data-color="#c8e6c9" style="background:#c8e6c9" title="Sage Green"></button>
+              <button class="wall-swatch"          data-color="#f8bbd0" style="background:#f8bbd0" title="Blush Pink"></button>
+              <button class="wall-swatch"          data-color="#4a4a4a" style="background:#4a4a4a" title="Charcoal"></button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <h4>Floor Style</h4>
+            <div class="floor-buttons">
+              <button class="floor-btn active" data-floor="wood">🪵 Wood</button>
+              <button class="floor-btn"        data-floor="marble">⬜ Marble</button>
+              <button class="floor-btn"        data-floor="carpet">🟤 Carpet</button>
+              <button class="floor-btn"        data-floor="concrete">🔲 Concrete</button>
+            </div>
+          </div>
+
+          <button class="btn-save" id="save-design-btn">💾 Save Design</button>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Featured Designs ─────────────────────────────────────────────────── -->
+  <section class="section" id="featured">
+    <div class="container">
+      <div class="section-header">
+        <h2>Featured Designs</h2>
+        <p>Hand-picked inspiring rooms from our community</p>
+      </div>
+      <div class="featured-grid">
+        <div class="design-card design-1">
+          <div class="design-info">
+            <h4>Coastal Living</h4>
+            <p>Light &amp; airy beach-inspired living room</p>
+            <div class="design-meta"><span>🏠 Living Room</span><span>⭐ 4.9</span></div>
+          </div>
+        </div>
+        <div class="design-card design-2">
+          <div class="design-info">
+            <h4>Urban Loft</h4>
+            <p>Industrial-chic open-plan kitchen</p>
+            <div class="design-meta"><span>🍳 Kitchen</span><span>⭐ 4.8</span></div>
+          </div>
+        </div>
+        <div class="design-card design-3">
+          <div class="design-info">
+            <h4>Nordic Retreat</h4>
+            <p>Warm Scandinavian bedroom sanctuary</p>
+            <div class="design-meta"><span>🛏️ Bedroom</span><span>⭐ 4.7</span></div>
+          </div>
+        </div>
+        <div class="design-card design-4">
+          <div class="design-info">
+            <h4>Zen Bathroom</h4>
+            <p>Spa-inspired minimalist bathroom</p>
+            <div class="design-meta"><span>🛁 Bathroom</span><span>⭐ 4.9</span></div>
+          </div>
+        </div>
+        <div class="design-card design-5">
+          <div class="design-info">
+            <h4>Creative Studio</h4>
+            <p>Functional and inspiring home office</p>
+            <div class="design-meta"><span>💼 Office</span><span>⭐ 4.8</span></div>
+          </div>
+        </div>
+        <div class="design-card design-6">
+          <div class="design-info">
+            <h4>Bohemian Dining</h4>
+            <p>Eclectic and vibrant dining space</p>
+            <div class="design-meta"><span>🍽️ Dining</span><span>⭐ 4.6</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA ───────────────────────────────────────────────────────────────── -->
+  <section class="cta-section">
+    <div class="cta-content">
+      <h2>Ready to Transform Your Space?</h2>
+      <p>Join thousands of homeowners who've used DesignSpace to create their dream interiors.</p>
+      <a href="#planner" class="btn-primary btn-large">Launch 3D Planner</a>
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────────────────────────────── -->
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-brand">
+        <span>🏠</span>
+        <strong>DesignSpace</strong>
+        <p>Reimagine every corner of your home.</p>
+      </div>
+      <div class="footer-links">
+        <div class="footer-col">
+          <h5>Explore</h5>
+          <a href="#">Living Rooms</a>
+          <a href="#">Bedrooms</a>
+          <a href="#">Kitchens</a>
+          <a href="#">Bathrooms</a>
+        </div>
+        <div class="footer-col">
+          <h5>Tools</h5>
+          <a href="#">3D Planner</a>
+          <a href="#">Colour Palette</a>
+          <a href="#">Style Quiz</a>
+          <a href="#">Inspiration</a>
+        </div>
+        <div class="footer-col">
+          <h5>Company</h5>
+          <a href="#">About</a>
+          <a href="#">Blog</a>
+          <a href="#">Careers</a>
+          <a href="#">Contact</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2024 DesignSpace. Built with ♥ for interior design enthusiasts.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
+  <script src="js/home.js"></script>
+</body>
+</html>
